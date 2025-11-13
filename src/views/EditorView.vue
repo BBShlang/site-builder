@@ -1,95 +1,100 @@
 <!-- src/views/EditorView.vue -->
 <template>
-  <div class="min-h-screen w-full h-full bg-gradient-to-b from-gray-50 to-purple-50 flex flex-col">
-    <!-- Toolbar -->
-    <div
-      ref="toolbarRef"
-      class="flex-shrink-0 bg-white border-b border-gray-200 shadow-sm py-4 px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
-    >
-      <div class="flex items-center">
-        <div
-          ref="logoRef"
-          class="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center mr-3 shadow-sm"
-        >
-          <Icon icon="heroicons:puzzle-piece" class="w-5 h-5 text-white" />
-        </div>
-        <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
-          {{ projectName || 'Новый проект' }}
-        </h1>
-      </div>
+  <div class="min-h-screen w-full bg-gradient-to-br from-[#f0f4ff] via-[#fdf6ff] to-[#fff0f8] overflow-hidden relative">
+    <!-- Фоновые декоративные элементы -->
+    <div class="absolute top-1/5 left-1/6 w-32 h-32 rounded-full bg-[#e0d6ff]/30 blur-3xl animate-pulse-slow"></div>
+    <div class="absolute bottom-1/4 right-1/5 w-40 h-40 rounded-full bg-[#ffd6f0]/30 blur-3xl animate-pulse-slow animation-delay-2000"></div>
+    <div class="absolute top-1/3 right-1/4 w-20 h-20 rounded-full bg-[#c8e6ff]/40 blur-2xl animate-float"></div>
 
-      <div ref="actionsRef" class="flex flex-wrap gap-3">
-        <!-- НОВАЯ КНОПКА -->
-        <button
-          @click="openSaveAsTemplateModal"
-          class="px-4 py-2.5 bg-gradient-to-r from-indigo-500 to-purple-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all flex items-center"
-        >
-          <Icon icon="heroicons:document-duplicate" class="w-4 h-4 mr-2" />
-          Сохранить как шаблон
-        </button>
-
-        <button
-          ref="exportBtnRef"
-          @click="exportToJson"
-          class="px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-sm font-medium rounded-xl hover:shadow-md transition-all flex items-center"
-        >
-          <Icon icon="heroicons:cloud-arrow-up" class="w-4 h-4 mr-2" />
-          Опубликовать
-        </button>
-
-        <button
-          ref="saveBtnRef"
-          @click="saveProject"
-          :disabled="!grapesData || saving"
-          class="px-4 py-2.5 bg-gray-800 text-white text-sm font-medium rounded-xl hover:bg-gray-900 hover:shadow-md transition-all flex items-center disabled:opacity-60 disabled:cursor-not-allowed"
-        >
-          <Icon v-if="!saving" icon="heroicons:check" class="w-4 h-4 mr-2" />
-          <span v-else class="flex items-center">
-            <svg
-              class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+    <div class="relative z-10 flex flex-col h-screen">
+      <!-- Toolbar -->
+      <div
+        ref="toolbarRef"
+        class="flex-shrink-0 bg-white/80 backdrop-blur-xl border-b border-white/40 shadow-sm py-4 px-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+      >
+        <div class="flex items-center">
+          <div
+            ref="logoRef"
+            class="w-10 h-10 rounded-xl bg-gradient-to-r from-[#6a5af9] to-[#a66bff] flex items-center justify-center mr-3 shadow-sm"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-          </span>
-          {{ saving ? 'Сохранение...' : 'Сохранить' }}
-        </button>
+          </div>
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
+            {{ projectName || 'Новый проект' }}
+          </h1>
+        </div>
 
-        <router-link
-          ref="backBtnRef"
-          to="/"
-          class="px-4 py-2.5 bg-white text-gray-700 border border-gray-300 text-sm font-medium rounded-xl hover:bg-gray-50 hover:shadow-sm transition-all flex items-center"
-        >
-          <Icon icon="heroicons:arrow-left" class="w-4 h-4 mr-2" />
-          Назад
-        </router-link>
+        <div ref="actionsRef" class="flex flex-wrap gap-3">
+          <button
+            @click="openSaveAsTemplateModal"
+            class="px-4 py-2.5 bg-gradient-to-r from-[#6a5af9] to-[#a66bff] text-white text-sm font-medium rounded-xl hover:shadow-md transition-all flex items-center group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            Сохранить как шаблон
+          </button>
+
+          <button
+            ref="exportBtnRef"
+            @click="exportToJson"
+            class="px-4 py-2.5 bg-gradient-to-r from-[#a66bff] to-[#d966ff] text-white text-sm font-medium rounded-xl hover:shadow-md transition-all flex items-center group"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
+            </svg>
+            Опубликовать
+          </button>
+
+          <button
+            ref="saveBtnRef"
+            @click="saveProject"
+            :disabled="!grapesData || saving"
+            class="px-4 py-2.5 bg-gray-800 text-white text-sm font-medium rounded-xl hover:bg-gray-900 hover:shadow-md transition-all flex items-center disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <svg v-if="!saving" xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            <span v-else class="flex items-center">
+              <svg
+                class="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            {{ saving ? 'Сохранение...' : 'Сохранить' }}
+          </button>
+
+          <router-link
+            ref="backBtnRef"
+            to="/"
+            class="px-4 py-2.5 bg-white/70 backdrop-blur-sm text-gray-700 border border-white/40 text-sm font-medium rounded-xl hover:bg-white/90 hover:shadow-sm transition-all flex items-center"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+            Назад
+          </router-link>
+        </div>
+      </div>
+
+      <!-- GrapesJS Editor -->
+      <div class="flex-1 w-full bg-white overflow-hidden">
+        <GrapesEditor
+          v-model="grapesData"
+          @ready="onEditorReady"
+          ref="grapesEditorRef"
+        />
       </div>
     </div>
 
-    <!-- GrapesJS Editor (теперь простой компонент!) -->
-    <div class="flex-1 w-full h-full overflow-hidden bg-white relative">
-      <GrapesEditor
-        v-model="grapesData"
-        @ready="onEditorReady"
-        ref="grapesEditorRef"
-      />
-    </div>
-
-    <!-- Onboarding Overlay (без изменений) -->
+    <!-- Onboarding Overlay (без изменений стиля — работает поверх) -->
     <div v-if="showOnboarding" class="fixed inset-0 z-50 pointer-events-none">
       <div class="absolute inset-0 bg-black opacity-60 pointer-events-auto"></div>
       <div
@@ -134,7 +139,7 @@
           <div></div>
           <button
             @click="nextStep"
-            class="px-3 py-1.5 bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-medium rounded-lg"
+            class="px-3 py-1.5 bg-gradient-to-r from-[#6a5af9] to-[#a66bff] text-white text-sm font-medium rounded-lg"
           >
             {{ activeStep === steps.length - 1 ? 'Готово' : 'Далее' }}
           </button>
@@ -146,13 +151,15 @@
     <Teleport to="body">
       <div
         v-if="showTemplateModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-50"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg- bg-opacity-40 backdrop-blur-sm"
       >
-        <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 transform transition-all">
+        <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full p-6 border border-white/50 transform transition-all">
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-lg font-bold text-gray-800">Сохранить как шаблон</h3>
             <button @click="showTemplateModal = false" class="text-gray-400 hover:text-gray-600">
-              <Icon icon="heroicons:x-mark" class="w-5 h-5" />
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
             </button>
           </div>
 
@@ -162,19 +169,17 @@
               <input
                 v-model="templateName"
                 type="text"
-                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-2.5 bg-white/80 border border-white/50 rounded-xl focus:ring-2 focus:ring-[#6a5af9] focus:border-transparent backdrop-blur-sm"
                 placeholder="Например: Мой продающий лендинг"
                 maxlength="60"
               />
             </div>
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1"
-                >Описание (опционально)</label
-              >
+              <label class="block text-sm font-medium text-gray-700 mb-1">Описание (опционально)</label>
               <textarea
                 v-model="templateDescription"
                 rows="2"
-                class="w-full px-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                class="w-full px-4 py-2.5 bg-white/80 border border-white/50 rounded-xl focus:ring-2 focus:ring-[#6a5af9] focus:border-transparent backdrop-blur-sm"
                 placeholder="Для чего подходит этот шаблон?"
               ></textarea>
             </div>
@@ -183,14 +188,14 @@
           <div class="mt-6 flex justify-end gap-3">
             <button
               @click="showTemplateModal = false"
-              class="px-4 py-2.5 text-gray-700 font-medium rounded-xl hover:bg-gray-100"
+              class="px-4 py-2.5 text-gray-700 font-medium rounded-xl hover:bg-gray-100/80 backdrop-blur-sm"
             >
               Отмена
             </button>
             <button
               @click="saveAsTemplate"
               :disabled="!templateName.trim() || savingTemplate"
-              class="px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:shadow-md disabled:opacity-60"
+              class="px-4 py-2.5 bg-gradient-to-r from-[#6a5af9] to-[#a66bff] text-white font-medium rounded-xl hover:shadow-md disabled:opacity-60 backdrop-blur-sm"
             >
               <span v-if="!savingTemplate">Сохранить шаблон</span>
               <span v-else class="flex items-center">
@@ -199,19 +204,8 @@
                   fill="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <circle
-                    class="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    stroke-width="4"
-                  ></circle>
-                  <path
-                    class="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                  />
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                 </svg>
                 Сохранение...
               </span>
@@ -227,7 +221,6 @@
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { Editor } from 'grapesjs'
-import { Icon } from '@iconify/vue'
 import api from '@/api/client'
 import GrapesEditor from '../components/GrapesEditor.vue'
 
@@ -501,6 +494,28 @@ onUnmounted(() => {
 })
 </script>
 
+
 <style scoped>
-/* Перенесли в GrapesEditor.vue — тут не нужно */
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.05); }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 6s ease-in-out infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
 </style>
+

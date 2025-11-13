@@ -8,6 +8,7 @@ import DefaultLayout from '@/components/layout/DefaultLayout.vue'
 import LoginView from '@/views/LoginView.vue'
 import RegisterView from '@/views/RegisterView.vue'
 import TemplatesView from '@/views/TemplatesView.vue'
+import AIBuilderView from '@/views/AIBuilderView.vue'
 
 // Lazy-loaded views (protected)
 const ProjectsView = () => import('@/views/ProjectsView.vue')
@@ -66,6 +67,13 @@ const router = createRouter({
           component: EditorView,
           props: { isNew: true },
           meta: { title: 'Новый лендинг' }
+        },
+                {
+          path: '/ai-builder',
+          name: 'ai-builder',
+          component: AIBuilderView,
+          props: { isNew: true },
+          meta: { title: 'Создание с помощью ИИ' }
         },
         {
           path: '/templates',
