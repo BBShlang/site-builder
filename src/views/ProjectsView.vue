@@ -1,9 +1,7 @@
-<!-- ProjectsView.vue -->
+<!-- src/views/ProjectsView.vue -->
 <template>
   <div class="min-h-screen bg-gradient-to-b from-gray-50 to-pink-50">
-    <!-- Main -->
     <main class="max-w-7xl mx-auto px-4 py-10 md:px-6">
-      <!-- Header -->
       <div class="mb-10 text-center md:text-left">
         <h1 class="text-3xl md:text-4xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
           Мои лендинги
@@ -13,17 +11,18 @@
         </p>
       </div>
 
-      <!-- Projects Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-if="loading" class="lg:col-span-3 text-center py-12">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
+          <p class="mt-4 text-gray-600">Загрузка проектов...</p>
+        </div>
+
         <!-- Empty state -->
-        <div v-if="projects.length === 0" class="lg:col-span-3">
-          <div 
-            class="bg-white rounded-2xl border-2 border-dashed border-purple-200 p-10 md:p-16 text-center shadow-sm hover:shadow-md transition-shadow"
-          >
+        <div v-else-if="projects.length === 0" class="lg:col-span-3">
+          <div class="bg-white rounded-2xl border-2 border-dashed border-purple-200 p-10 md:p-16 text-center shadow-sm hover:shadow-md transition-shadow">
             <div class="mx-auto w-20 h-20 bg-purple-50 rounded-2xl flex items-center justify-center mb-6">
               <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" 
-                      d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
             <h3 class="text-xl font-semibold text-gray-800 mb-3">У вас пока нет лендингов</h3>
@@ -34,7 +33,7 @@
               @click="createNewProject"
               class="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-xl font-semibold shadow-md hover:shadow-lg transition-all transform hover:-translate-y-0.5"
             >
-              🚀 Создать лендинг
+              Создать лендинг
             </button>
           </div>
         </div>
@@ -45,14 +44,8 @@
           :key="project.id"
           @click="openEditor(project.id)"
           class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 cursor-pointer group hover:-translate-y-1 relative"
-          :class="{ 'border-dashed border-2 border-purple-200': project.isFirst }"
         >
-          <!-- Статус-метка -->
-          <div 
-            v-if="!project.isFirst"
-            class="absolute top-4 right-4 flex gap-1"
-          >
-
+          <div class="absolute top-4 right-4 flex gap-1">
             <button 
               @click.stop="deleteProject(project.id)" 
               class="p-1.5 bg-white rounded-full shadow-sm text-gray-500 hover:text-red-500 hover:bg-red-50 transition-colors"
@@ -65,34 +58,15 @@
           </div>
 
           <div class="p-5">
-            <div class="flex justify-between items-start mb-3">
-              <div class="min-w-0">
-                <h3 class="font-bold text-lg text-gray-800 group-hover:text-purple-700 truncate">
-                  {{ project.name }}
-                </h3>
-                <span 
-                  v-if="project.isFirst" 
-                  class="inline-block mt-1 px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-medium rounded-full"
-                >
-                  🎯 Начните здесь
-                </span>
-              </div>
-            </div>
+            <h3 class="font-bold text-lg text-gray-800 group-hover:text-purple-700 truncate">
+              {{ project.name }}
+            </h3>
             <p class="text-xs text-gray-500 mb-4">
               Обновлено: {{ formatDate(project.updatedAt) }}
             </p>
 
-            <!-- Preview thumbnail -->
             <div class="mb-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 border border-gray-200 w-full h-36 flex items-center justify-center">
-              <div v-if="project.isFirst" class="text-center px-4">
-                <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                  </svg>
-                </div>
-                <p class="text-sm text-purple-700 font-medium">Нажмите, чтобы начать</p>
-              </div>
-              <div v-else class="text-center px-4">
+              <div class="text-center px-4">
                 <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center mx-auto mb-2">
                   <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-pink-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -123,91 +97,56 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import api from '@/api/client'
 
 const router = useRouter()
-
-// Заглушка для данных проектов
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const projects = ref<any[]>([])
+const loading = ref(true)
 
-// Загрузка проектов из localStorage
-const loadProjects = () => {
+const fetchProjects = async () => {
   try {
-    const saved = localStorage.getItem('landing-projects')
-    if (saved) {
-      projects.value = JSON.parse(saved)
-    }
-    
-    // Если нет проектов, создаем первый пустой
-    if (projects.value.length === 0) {
-      createFirstProject()
-    }
-  } catch (error) {
-    console.error('Ошибка загрузки проектов:', error)
-    createFirstProject()
+    const { data } = await api.get('/projects')
+    projects.value = Array.isArray(data) ? data : []
+  } catch (e) {
+    console.error('Ошибка загрузки проектов:', e)
+    alert('❌ Не удалось загрузить список проектов')
+    projects.value = []
+  } finally {
+    loading.value = false
   }
 }
 
-// Создание первого проекта
-const createFirstProject = () => {
-  const firstProject = {
-    id: 'first-project',
-    name: 'Начните создавать',
-    updatedAt: new Date().toISOString(),
-    framesCount: 1,
-    publishedUrl: null,
-    isFirst: true // Флаг для первого проекта
+const createNewProject = async () => {
+  try {
+    const { data } = await api.post('/projects', {
+      name: `Новый лендинг ${projects.value.length + 1}`,
+      jsonModel: null,
+      framesCount: 1,
+    })
+    router.push(`/editor/${data.id}`)
+  } catch (e) {
+    console.error('Ошибка создания проекта:', e)
+    alert('❌ Не удалось создать проект')
   }
-  projects.value = [firstProject]
-  saveProjects()
-}
-
-// Сохранение проектов в localStorage
-const saveProjects = () => {
-  localStorage.setItem('landing-projects', JSON.stringify(projects.value))
-}
-
-const createNewProject = () => {
-  const newProject = {
-    id: 'proj-' + Date.now(),
-    name: 'Новый лендинг ' + (projects.value.length + 1),
-    updatedAt: new Date().toISOString(),
-    framesCount: 1,
-    publishedUrl: null,
-    isFirst: false
-  }
-  projects.value.push(newProject)
-  saveProjects()
-  router.push(`/editor/${newProject.id}`)
 }
 
 const openEditor = (id: string) => {
-  const project = projects.value.find(p => p.id === id)
-  if (project?.isFirst) {
-    createNewProject()
-  } else {
-    router.push(`/editor/${id}`)
-  }
+  router.push(`/editor/${id}`)
 }
 
-const deleteProject = (id: string) => {
-  if (confirm('Удалить лендинг? Действие нельзя отменить.')) {
+const deleteProject = async (id: string) => {
+  if (!confirm('Удалить лендинг? Действие нельзя отменить.')) return
+  try {
+    await api.delete(`/projects/${id}`)
     projects.value = projects.value.filter(p => p.id !== id)
-    saveProjects()
-    
-    // Если удалили все проекты, создаем первый снова
-    if (projects.value.length === 0) {
-      createFirstProject()
-    }
+    alert('✅ Проект удалён')
+  } catch (e) {
+    console.error('Ошибка удаления:', e)
+    alert('❌ Не удалось удалить проект')
   }
 }
 
-// Загружаем проекты при монтировании
-onMounted(() => {
-  loadProjects()
-})
-
-// Хелперы
 const formatDate = (iso: string) => {
   return new Date(iso).toLocaleDateString('ru-RU', {
     day: 'numeric',
@@ -220,4 +159,8 @@ const formatDate = (iso: string) => {
 const plural = (n: number) => {
   return n === 1 ? 'а' : n > 1 && n < 5 ? 'ы' : ''
 }
+
+onMounted(() => {
+  fetchProjects()
+})
 </script>

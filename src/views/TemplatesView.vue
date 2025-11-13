@@ -70,198 +70,284 @@
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
-
 // ===========================
-// ВСТРОЕННЫЕ ШАБЛОНЫ (3 штуки)
+// ВСТРОЕННЫЕ ШАБЛОНЫ (локально, совместимые с GrapesEditor.vue)
 // ===========================
 const builtInTemplates = [
   {
-    id: 'template-hero',
-    name: 'Герой + CTA',
-    description: 'Яркий заголовок, подзаголовок и кнопка — идеально для MVP и стартапов',
-    colorPalette: ['#4f46e5', '#7c3aed', '#ec4899'],
+    id: 'template-online-course',
+    name: 'Онлайн-курс',
+    description: 'Идеален для продажи курсов: таймер, отзывы, форма заявки',
+    colorPalette: ['#4f46e5', '#7c3aed', '#ec4899'], // [primary, accent1, accent2]
     jsonModel: {
       components: [
         {
-          type: 'default',
-          tagName: 'div',
-          attributes: { class: 'hero text-center py-20 px-4 bg-gradient-to-r from-indigo-50 to-purple-50 min-h-screen flex flex-col justify-center' },
+          type: 'header',
+          tagName: 'header',
+          attributes: { class: 'site-header' },
+          style: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '20px',
+            background: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          },
+          components: [
+            { type: 'text', content: 'LOGO' },
+            { type: 'text', content: 'Меню' },
+          ],
+        },
+        {
+          type: 'section',
+          style: { padding: '60px 20px', textAlign: 'center', background: '#f8fafc' },
           components: [
             {
               type: 'text',
-              content: '<h1 class="text-3xl md:text-5xl font-extrabold text-gray-900 leading-tight">Ваш продукт<br />решает проблему</h1>'
+              tagName: 'h1',
+              style: { fontSize: '2.5rem', color: '#1e293b', marginBottom: '20px' },
+              content: 'Освой профессию с нуля за 8 недель',
             },
             {
               type: 'text',
-              content: '<p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">Опишите суть за 10 секунд — и получите первых клиентов</p>'
+              tagName: 'p',
+              style: { fontSize: '1.2rem', color: '#64748b', marginBottom: '30px' },
+              content: 'Практический курс с поддержкой наставника',
             },
             {
-              type: 'default',
-              tagName: 'div',
-              attributes: { class: 'mt-8 flex flex-col sm:flex-row justify-center gap-4' },
-              components: [
-                {
-                  type: 'button',
-                  tagName: 'button',
-                  attributes: { class: 'px-6 py-3 bg-indigo-600 text-white font-medium rounded-xl shadow hover:bg-indigo-700 transition' },
-                  content: 'Начать бесплатно'
-                },
-                {
-                  type: 'button',
-                  tagName: 'button',
-                  attributes: { class: 'px-6 py-3 bg-white text-indigo-600 font-medium rounded-xl border border-indigo-300 hover:bg-indigo-50 transition' },
-                  content: 'Демо'
-                }
-              ]
-            }
-          ]
-        }
+              type: 'button',
+              tagName: 'button',
+              style: {
+                padding: '14px 32px',
+                background: '#4f46e5',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+              },
+              content: 'Записаться на курс',
+            },
+            {
+              type: 'image',
+              attributes: {
+                src: 'image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="800" height="400" viewBox="0 0 800 400"%3E%3Crect width="800" height="400" fill="%23f1f5f9"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="18" fill="%2394a3b8"%3EКурс: дважды кликните для загрузки фото%3C/text%3E%3C/svg%3E',
+                alt: 'Превью курса',
+              },
+              style: { width: '100%', height: 'auto', cursor: 'pointer', marginTop: '40px' },
+            },
+          ],
+        },
+        {
+          type: 'section',
+          style: { padding: '60px 20px', background: '#ffffff', textAlign: 'center' },
+          components: [
+            {
+              type: 'text',
+              tagName: 'h2',
+              style: { fontSize: '2rem', color: '#1e293b', marginBottom: '30px' },
+              content: 'Отзывы учеников',
+            },
+            {
+              type: 'text',
+              content: '«Курс изменил мою карьеру!» — Анна, UX-дизайнер',
+              style: { fontSize: '1.1rem', color: '#64748b', marginBottom: '15px' },
+            },
+            {
+              type: 'text',
+              content: '«Понятно даже без опыта» — Дмитрий, начинающий',
+              style: { fontSize: '1.1rem', color: '#64748b' },
+            },
+          ],
+        },
+        {
+          type: 'footer',
+          tagName: 'footer',
+          style: {
+            padding: '30px',
+            textAlign: 'center',
+            background: '#f1f5f9',
+            color: '#64748b',
+          },
+          content: '© 2025 Онлайн-курс',
+        },
       ],
-      styles: `
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.5; }
-        * { box-sizing: border-box; }
-      `
-    }
+    },
   },
   {
-    id: 'template-features',
-    name: 'Фичи + Преимущества',
-    description: 'Три колонки с иконками — покажите, почему вас стоит выбрать',
+    id: 'template-fitness-product',
+    name: 'Фитнес-продукт',
+    description: 'Продающий лендинг для товаров: акцент на выгоде и отзыве',
     colorPalette: ['#0ea5e9', '#3b82f6', '#6366f1'],
     jsonModel: {
       components: [
         {
-          type: 'default',
-          tagName: 'div',
-          attributes: { class: 'features py-16 px-4 bg-white' },
+          type: 'header',
+          tagName: 'header',
+          style: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '20px',
+            background: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          },
+          components: [{ type: 'text', content: 'FITBRAND' }, { type: 'text', content: 'Каталог' }],
+        },
+        {
+          type: 'section',
+          style: { padding: '80px 20px', textAlign: 'center', background: '#f8fafc' },
           components: [
             {
               type: 'text',
-              content: '<h2 class="text-3xl font-bold text-center text-gray-900">Почему нас выбирают</h2>'
+              tagName: 'h1',
+              style: { fontSize: '2.8rem', color: '#1e293b', marginBottom: '20px' },
+              content: 'Твоя сила начинается здесь',
             },
             {
               type: 'text',
-              content: '<p class="mt-4 text-gray-600 text-center max-w-xl mx-auto">Просто, быстро и без технических знаний</p>'
+              tagName: 'p',
+              style: { fontSize: '1.2rem', color: '#64748b', marginBottom: '30px' },
+              content: 'Натуральный протеин без сахара и ГМО',
             },
             {
-              type: 'default',
-              tagName: 'div',
-              attributes: { class: 'mt-12 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto' },
-              components: [
-                {
-                  type: 'default',
-                  tagName: 'div',
-                  attributes: { class: 'text-center p-6' },
-                  components: [
-                    {
-                      type: 'text',
-                      content: '<div class="w-14 h-14 mx-auto bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl">⚡</div>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<h3 class="mt-4 text-xl font-semibold text-gray-900">Мгновенно</h3>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<p class="mt-2 text-gray-600">Создайте лендинг за 5 минут</p>'
-                    }
-                  ]
-                },
-                {
-                  type: 'default',
-                  tagName: 'div',
-                  attributes: { class: 'text-center p-6' },
-                  components: [
-                    {
-                      type: 'text',
-                      content: '<div class="w-14 h-14 mx-auto bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl">🎨</div>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<h3 class="mt-4 text-xl font-semibold text-gray-900">Гибко</h3>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<p class="mt-2 text-gray-600">Меняйте всё под себя</p>'
-                    }
-                  ]
-                },
-                {
-                  type: 'default',
-                  tagName: 'div',
-                  attributes: { class: 'text-center p-6' },
-                  components: [
-                    {
-                      type: 'text',
-                      content: '<div class="w-14 h-14 mx-auto bg-blue-100 rounded-xl flex items-center justify-center text-blue-600 text-xl">📱</div>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<h3 class="mt-4 text-xl font-semibold text-gray-900">Адаптивно</h3>'
-                    },
-                    {
-                      type: 'text',
-                      content: '<p class="mt-2 text-gray-600">Работает на всех устройствах</p>'
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
+              type: 'button',
+              tagName: 'button',
+              style: {
+                padding: '14px 36px',
+                background: '#0ea5e9',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '50px',
+                cursor: 'pointer',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+              },
+              content: 'Купить за 1990 ₽',
+            },
+            {
+              type: 'image',
+              attributes: {
+                src: 'image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="600" height="500" viewBox="0 0 600 500"%3E%3Crect width="600" height="500" fill="%23f1f5f9"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="18" fill="%2394a3b8"%3EПродукт: дважды кликните для загрузки фото%3C/text%3E%3C/svg%3E',
+                alt: 'Протеин',
+              },
+              style: { width: '80%', height: 'auto', cursor: 'pointer', marginTop: '40px' },
+            },
+          ],
+        },
+        {
+          type: 'footer',
+          tagName: 'footer',
+          style: {
+            padding: '30px',
+            textAlign: 'center',
+            background: '#f1f5f9',
+            color: '#64748b',
+          },
+          content: '© 2025 FITBRAND',
+        },
       ],
-      styles: `
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-      `
-    }
+    },
   },
   {
-    id: 'template-footer-cta',
-    name: 'Футер + Финальный CTA',
-    description: 'Завершающий блок с призывом к действию и контактами',
+    id: 'template-saas-service',
+    name: 'SaaS-сервис',
+    description: 'Для IT-продуктов: упор на функционал и интеграции',
     colorPalette: ['#1e293b', '#334155', '#64748b'],
     jsonModel: {
       components: [
         {
-          type: 'default',
-          tagName: 'div',
-          attributes: { class: 'cta-footer py-16 px-4 bg-gray-900 text-white' },
+          type: 'header',
+          tagName: 'header',
+          style: {
+            display: 'flex',
+            justifyContent: 'space-between',
+            padding: '20px',
+            background: '#ffffff',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+          },
+          components: [{ type: 'text', content: 'CloudFlow' }, { type: 'text', content: 'Функции • Цены • Контакты' }],
+        },
+        {
+          type: 'section',
+          style: { padding: '100px 20px', textAlign: 'center', background: '#f8fafc' },
           components: [
             {
               type: 'text',
-              content: '<h2 class="text-3xl font-bold text-center">Готовы начать?</h2>'
+              tagName: 'h1',
+              style: { fontSize: '2.5rem', color: '#1e293b', marginBottom: '20px' },
+              content: 'Автоматизируйте ваш бизнес в облаке',
             },
             {
               type: 'text',
-              content: '<p class="mt-4 text-gray-300 text-center max-w-xl mx-auto">Присоединяйтесь к тысячам пользователей, которые уже создали свой лендинг</p>'
+              tagName: 'p',
+              style: { fontSize: '1.2rem', color: '#64748b', marginBottom: '40px' },
+              content: 'Интеграция с 50+ сервисами. Гарантия uptime 99.9%',
             },
             {
-              type: 'default',
-              tagName: 'div',
-              attributes: { class: 'mt-8 flex justify-center' },
+              type: 'button',
+              tagName: 'button',
+              style: {
+                padding: '14px 32px',
+                background: '#1e293b',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+              },
+              content: 'Начать бесплатно',
+            },
+          ],
+        },
+        {
+          type: 'section',
+          style: { padding: '60px 20px', background: '#ffffff', textAlign: 'center' },
+          components: [
+            {
+              type: 'text',
+              tagName: 'h2',
+              style: { fontSize: '2rem', color: '#1e293b', marginBottom: '30px' },
+              content: 'Как это работает',
+            },
+            {
+              type: 'text',
+              content: '1. Подключите аккаунт\n2. Настройте триггеры\n3. Получайте результаты',
+              style: { whiteSpace: 'pre-line', fontSize: '1.1rem', color: '#64748b' },
+            },
+            {
+              type: 'video',
+              tagName: 'video',
+              attributes: { controls: true },
+              style: {
+                width: '100%',
+                height: 'auto',
+                backgroundColor: '#000',
+                cursor: 'pointer',
+                marginTop: '30px',
+              },
               components: [
                 {
-                  type: 'button',
-                  tagName: 'button',
-                  attributes: { class: 'px-8 py-3 bg-white text-gray-900 font-bold rounded-xl shadow-lg hover:shadow-xl transition' },
-                  content: 'Создать сейчас'
-                }
-              ]
+                  tagName: 'source',
+                  attributes: { src: 'video/mp4;base64,', type: 'video/mp4' },
+                },
+                'Ваш браузер не поддерживает видео.',
+              ],
             },
-            {
-              type: 'text',
-              content: '<div class="mt-12 border-t border-gray-800 pt-8 text-center text-gray-400 text-sm">© 2025 Ваш сервис. Все права защищены.</div>'
-            }
-          ]
-        }
+          ],
+        },
+        {
+          type: 'footer',
+          tagName: 'footer',
+          style: {
+            padding: '30px',
+            textAlign: 'center',
+            background: '#f1f5f9',
+            color: '#64748b',
+          },
+          content: '© 2025 CloudFlow',
+        },
       ],
-      styles: `
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
-      `
-    }
-  }
+    },
+  },
 ]
-
 // ===========================
 // ЛОГИКА: ИСПОЛЬЗОВАТЬ ШАБЛОН → СОЗДАТЬ ПРОЕКТ
 // ===========================
