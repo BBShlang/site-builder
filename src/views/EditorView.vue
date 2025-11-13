@@ -256,8 +256,8 @@ const steps = [
   },
   {
     target: exportBtnRef,
-    title: 'Экспорт в JSON',
-    description: 'Скачайте проект в формате JSON для резервной копии или переноса.',
+    title: 'Публикация лендинга',
+    description: 'Опубликуйте проект — он станет доступен по публичной ссылке!',
   },
   {
     target: backBtnRef,
@@ -352,6 +352,7 @@ const saveAsTemplate = async () => {
 
   try {
     savingTemplate.value = true
+    // Заглушка — интеграция с бэкендом для шаблонов не указана
     alert('✅ Шаблон успешно сохранён!')
     showTemplateModal.value = false
   } catch (e) {
@@ -369,10 +370,15 @@ const projectId = route.params.id as string
 const isNew = route.path === '/editor/new'
 
 const grapesData = ref<Record<string, unknown> | null>(null)
-const grapesEditorRef = ref<InstanceType<typeof GrapesEditor> | null>(null)
-const currentEditor = ref<Editor | null>(null) // ✅ ref, а не let
+const currentEditor = ref<Editor | null>(null)
 const projectName = ref<string>('')
 const saving = ref(false)
+const publishing = ref(false)
+
+// Получаем userId из localStorage
+const getUserId = (): string | null => {
+  return localStorage.getItem('userId')
+}
 
 const EMPTY_PROJECT_DATA = {
   pages: [
@@ -407,16 +413,28 @@ const EMPTY_PROJECT_DATA = {
   dataSources: [],
 }
 
-// ✅ ОБЯЗАТЕЛЬНО до onMounted
 const onEditorReady = (editor: Editor) => {
   currentEditor.value = editor
 }
 
+// === Загрузка проекта ===
 const loadProject = async () => {
   if (isNew) return null
   try {
-    const { data } = await api.get(`/projects/${projectId}`)
-    return data
+    const { data } = await api.get(`/api/projects/${projectId}`)
+    let name = 'Без названия'
+    let model = EMPTY_PROJECT_DATA
+
+    try {
+      const parsed = JSON.parse(data.jsonData || '{}')
+      name = parsed.name || name
+      model = parsed.model || EMPTY_PROJECT_DATA
+    } catch (e) {
+      console.warn('Не удалось распарсить jsonData проекта')
+    }
+
+    projectName.value = name
+    return { ...data, name, model }
   } catch (e) {
     console.error('Ошибка загрузки проекта:', e)
     alert('❌ Не удалось загрузить проект')
@@ -425,28 +443,43 @@ const loadProject = async () => {
   }
 }
 
+// === Сохранение проекта ===
 const saveProject = async () => {
-  if (!grapesData.value) {
-    alert('❌ Нет данных для сохранения')
+  const userId = getUserId()
+  if (!userId) {
+    alert('❌ Вы не авторизованы')
+    router.push('/login')
     return
   }
 
-  const name = projectName.value.trim() || 'Без названия'
-  const payload = {
-    name,
-    ...grapesData.value,
-    framesCount: 1,
+  if (!currentEditor.value) {
+    alert('❌ Редактор ещё не готов')
+    return
   }
 
   try {
     saving.value = true
+
+    const model = currentEditor.value.getProjectData
+      ? currentEditor.value.getProjectData()
+      : EMPTY_PROJECT_DATA
+
+    const projectJson = {
+      name: projectName.value.trim() || 'Без названия',
+      model,
+    }
+
+    const payload = {
+      jsonData: JSON.stringify(projectJson),
+      user: { id: userId },
+    }
+
     if (isNew) {
-      const { data } = await api.post('/projects', payload)
+      const { data } = await api.post('/api/projects', payload)
       router.replace(`/editor/${data.id}`)
-      projectName.value = data.name
-      grapesData.value = data.jsonModel || grapesData.value
+      projectName.value = projectJson.name
     } else {
-      await api.put(`/projects/${projectId}`, payload)
+      await api.put(`/api/projects/${projectId}`, payload)
       alert('✅ Проект сохранён!')
     }
   } catch (e) {
@@ -457,37 +490,59 @@ const saveProject = async () => {
   }
 }
 
-// ✅ Исправленная функция экспорта
-const exportToJson = () => {
+// === Публикация проекта (вместо экспорта) ===
+const publishProject = async () => {
+  if (isNew) {
+    alert('❌ Сначала сохраните проект, чтобы опубликовать его.')
+    return
+  }
+
+  const userId = getUserId()
+  if (!userId) {
+    alert('❌ Вы не авторизованы')
+    router.push('/login')
+    return
+  }
+
   if (!currentEditor.value) {
     alert('❌ Редактор ещё не готов')
     return
   }
 
-  const name = (projectName.value || 'landing').replace(/\s+/g, '_')
-  const data = {
-    html: currentEditor.value.getHtml(),
-    css: currentEditor.value.getCss(),
+  try {
+    publishing.value = true
+
+    const model = currentEditor.value.getProjectData
+      ? currentEditor.value.getProjectData()
+      : EMPTY_PROJECT_DATA
+
+    const projectJson = {
+      name: projectName.value.trim() || 'Без названия',
+      model,
+    }
+
+    const payload = {
+      jsonData: JSON.stringify(projectJson),
+      user: { id: userId },
+    }
+
+    // Отправляем на /api/projects/{id}/export
+    await api.post(`/api/projects/${projectId}/export`, payload)
+
+    alert('✅ Проект опубликован! Скоро он будет доступен по публичной ссылке.')
+  } catch (e) {
+    console.error('Ошибка публикации:', e)
+    alert('❌ Не удалось опубликовать проект. Повторите попытку позже.')
+  } finally {
+    publishing.value = false
   }
-
-  const jsonStr = JSON.stringify(data, null, 2)
-  const blob = new Blob([jsonStr], { type: 'application/json' })
-  const url = URL.createObjectURL(blob)
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `${name}.json`
-  document.body.appendChild(a)
-  a.click()
-  URL.revokeObjectURL(url)
-  document.body.removeChild(a)
-
-  alert('✅ Экспорт завершён! Файл содержит точный HTML и CSS.')
 }
 
+// === Инициализация ===
 onMounted(async () => {
   const project = isNew ? null : await loadProject()
   if (project) {
-    grapesData.value = project.jsonModel
+    grapesData.value = project.model
     projectName.value = project.name
   } else {
     grapesData.value = EMPTY_PROJECT_DATA
@@ -496,6 +551,7 @@ onMounted(async () => {
   startOnboarding()
 })
 
+// === Обработка Esc в модалке ===
 watch(showTemplateModal, (isOpen) => {
   const handleEsc = (e: KeyboardEvent) => {
     if (e.key === 'Escape') showTemplateModal.value = false
@@ -513,7 +569,6 @@ onUnmounted(() => {
   })
 })
 </script>
-
 <style scoped>
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }

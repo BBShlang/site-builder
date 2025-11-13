@@ -1629,7 +1629,7 @@ const builtInTemplates = [
 const fetchUserTemplates = async () => {
   loadingUserTemplates.value = true
   try {
-    const { data } = await api.get('/templates')
+    const { data } = await api.get('/api/templates') // ✅ Путь исправлен
     userTemplates.value = Array.isArray(data) ? data : []
   } catch (e) {
     console.error('Ошибка загрузки шаблонов:', e)
@@ -1642,19 +1642,55 @@ const fetchUserTemplates = async () => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const useTemplate = async (template: any) => {
-  try {
-    const response = await api.post('/projects', {
-      name: `Копия: ${template.name}`,
-      jsonModel: template.jsonModel,
-      framesCount: 1,
-    })
-    router.push(`/editor/${response.data.id}`)
+  const userId = localStorage.getItem('userId')
+  if (!userId) {
+    alert('❌ Вы не авторизованы')
+    router.push('/login')
+    return
+  }
+
+   try {
+    // Восстанавливаем модель из jsonData
+    let jsonModel = {}
+    try {
+      jsonModel = JSON.parse(template.jsonData || '{}')
+    } catch (e) {
+      console.warn('Не удалось распарсить jsonData шаблона')
+    }
+        const payload = {
+      jsonData: JSON.stringify({
+        name: `Копия: ${template.name}`,
+        model: jsonModel,
+      }),
+      user: { id: userId },
+    }
+        const { data } = await api.post('/api/projects', payload) // ✅ /api/projects
+    router.push(`/editor/${data.id}`)
   } catch (error) {
     console.error('Ошибка при создании проекта:', error)
     alert('❌ Не удалось создать проект на основе шаблона')
   }
 }
 
+const templateName = ref('')
+const templateDescription = ref('')
+const savingTemplate = ref(false)
+const showTemplateModal = ref(false)
+
+const openSaveAsTemplateModal = () => {
+}
+const saveAsTemplate = async () => {
+  const userId = localStorage.getItem('userId')
+  if (!userId) {
+    alert('❌ Вы не авторизованы')
+    router.push('/login')
+    showTemplateModal.value = false
+    return
+  }
+    alert('❗ Сохранение шаблона должно вызываться из редактора')
+  showTemplateModal.value = false
+  return
+}
 const formatDate = (iso: string) => {
   return new Date(iso).toLocaleDateString('ru-RU', {
     day: 'numeric',
@@ -1662,7 +1698,6 @@ const formatDate = (iso: string) => {
   })
 }
 
-// Загружаем шаблоны при открытии вкладки "Мои"
 watch(activeTab, (newTab) => {
   if (newTab === 'my' && userTemplates.value.length === 0) {
     fetchUserTemplates()

@@ -144,22 +144,51 @@
 .animation-delay-2000 {
   animation-delay: 2s;
 }
-</style>
 
+.animation-delay-3000 {
+  animation-delay: 3s;
+}
+</style>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api/client'
 
 const router = useRouter()
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const projects = ref<any[]>([])
 const loading = ref(true)
 
+// Вспомогательная функция: получить userId из localStorage
+const getUserId = (): string | null => {
+  return localStorage.getItem('userId')
+}
+
+// Вспомогательная функция: извлечь name и framesCount из jsonData
+const extractProjectInfo = (project: any) => {
+  try {
+    const data = project.jsonData ? JSON.parse(project.jsonData) : {}
+    return {
+      ...project,
+      name: data.name || 'Без названия',
+      framesCount: data.frames ? data.frames.length : 0,
+      updatedAt: project.updatedAt || new Date().toISOString(),
+    }
+  } catch {
+    return {
+      ...project,
+      name: 'Без названия',
+      framesCount: 0,
+      updatedAt: project.updatedAt || new Date().toISOString(),
+    }
+  }
+}
+
 const fetchProjects = async () => {
   try {
-    const { data } = await api.get('/projects')
-    projects.value = Array.isArray(data) ? data : []
+    const { data } = await api.get('/api/projects') // ✅ /api/projects
+    projects.value = Array.isArray(data)
+      ? data.map(extractProjectInfo)
+      : []
   } catch (e) {
     console.error('Ошибка загрузки проектов:', e)
     alert('❌ Не удалось загрузить список проектов')
@@ -170,12 +199,28 @@ const fetchProjects = async () => {
 }
 
 const createNewProject = async () => {
+  const userId = getUserId()
+  if (!userId) {
+    alert('❌ Вы не авторизованы')
+    router.push('/login')
+    return
+  }
+
   try {
-    const { data } = await api.post('/projects', {
+    // Формируем jsonData с UI-полями
+    const jsonData = JSON.stringify({
       name: `Новый лендинг ${projects.value.length + 1}`,
-      jsonModel: null,
-      framesCount: 1,
+      frames: [], // пустой массив фреймов
     })
+
+    // Отправляем структуру, как ожидает бэкенд
+    const { data } = await api.post('/api/projects', {
+      jsonData,
+      user: {
+        id: userId, // ✅ только id, без password!
+      },
+    })
+
     router.push(`/editor/${data.id}`)
   } catch (e) {
     console.error('Ошибка создания проекта:', e)
@@ -190,7 +235,7 @@ const openEditor = (id: string) => {
 const deleteProject = async (id: string) => {
   if (!confirm('Удалить лендинг? Действие нельзя отменить.')) return
   try {
-    await api.delete(`/projects/${id}`)
+    await api.delete(`/api/projects/${id}`) // ✅ /api/projects
     projects.value = projects.value.filter(p => p.id !== id)
     alert('✅ Проект удалён')
   } catch (e) {
