@@ -4,12 +4,25 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, defineProps, defineEmits } from 'vue'
 import grapesjs, { Editor } from 'grapesjs'
 import 'grapesjs/dist/css/grapes.min.css'
 
 import webpagePreset from 'grapesjs-preset-webpage'
 import tabsPlugin from 'grapesjs-tabs'
+
+const props = defineProps<{
+  modelValue?: {
+    components?: unknown[]
+    styles?: unknown[]
+    pages?: unknown[]
+  } | null
+}>()
+
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: Record<string, unknown>): void
+  (e: 'ready', editor: Editor): void
+}>()
 
 const container = ref<HTMLDivElement | null>(null)
 let editor: Editor | null = null
@@ -120,6 +133,42 @@ onMounted(() => {
     },
   })
 
+  // Эмитим редактор
+  emit('ready', editor)
+
+  // Загружаем начальные данные, если есть
+  if (props.modelValue) {
+    editor.setComponents(props.modelValue.components || [])
+    editor.setStyle(props.modelValue.styles || [])
+  }
+
+  // Функция синхронизации модели
+  const updateModel = () => {
+    const components = editor!.getComponents().toJSON()
+    const styles = editor!.getStyle().toJSON()
+
+    let pages = []
+    if (editor!.Pages) {
+      pages = editor!.Pages.getAll().map(p => p.toJSON())
+    } else {
+      // fallback на случай, если Pages API недоступен
+      pages = [{
+        id: 'main',
+        name: 'Main',
+        component: { type: 'body', components },
+        styles,
+      }]
+    }
+
+    emit('update:modelValue', { components, styles, pages })
+  }
+
+  // Подписка на изменения
+  editor.on('component:add component:remove component:update style:change', () => {
+    updateModel()
+  })
+
+  // Инициализация блоков
   const bm = editor.BlockManager
   bm.getAll().reset()
 
@@ -152,7 +201,7 @@ onMounted(() => {
     content: '<p style="font-size:1.1rem; line-height:1.6;">Редактируемый текст</p>',
   })
 
-  // === Изображение (с поддержкой загрузки) ===
+  // === Изображение ===
   bm.add('image', {
     label: 'Изображение',
     category: 'Медиа',
@@ -168,7 +217,7 @@ onMounted(() => {
     activate: true,
   })
 
-  // === Видео (с поддержкой загрузки) ===
+  // === Видео ===
   bm.add('video', {
     label: 'Видео',
     category: 'Медиа',
@@ -177,13 +226,13 @@ onMounted(() => {
       tagName: 'video',
       attributes: {
         controls: true,
-        src: '', // будет заменено
+        src: '',
       },
       components: [
         {
           tagName: 'source',
           attributes: {
-            src: 'video/mp4;base64,', // placeholder
+            src: 'video/mp4;base64,',
             type: 'video/mp4',
           },
         },

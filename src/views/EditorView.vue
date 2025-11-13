@@ -18,7 +18,7 @@
             class="w-10 h-10 rounded-xl bg-gradient-to-r from-[#6a5af9] to-[#a66bff] flex items-center justify-center mr-3 shadow-sm"
           >
             <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V5a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
           <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
@@ -94,7 +94,7 @@
       </div>
     </div>
 
-    <!-- Onboarding Overlay (без изменений стиля — работает поверх) -->
+    <!-- Onboarding Overlay -->
     <div v-if="showOnboarding" class="fixed inset-0 z-50 pointer-events-none">
       <div class="absolute inset-0 bg-black opacity-60 pointer-events-auto"></div>
       <div
@@ -151,7 +151,7 @@
     <Teleport to="body">
       <div
         v-if="showTemplateModal"
-        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg- bg-opacity-40 backdrop-blur-sm"
+        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-40 backdrop-blur-sm"
       >
         <div class="bg-white/90 backdrop-blur-xl rounded-2xl shadow-2xl max-w-md w-full p-6 border border-white/50 transform transition-all">
           <div class="flex justify-between items-start mb-4">
@@ -224,7 +224,7 @@ import { Editor } from 'grapesjs'
 import api from '@/api/client'
 import GrapesEditor from '../components/GrapesEditor.vue'
 
-// === Refs для onboarding (без изменений)
+// === Refs для onboarding ===
 const toolbarRef = ref<HTMLElement | null>(null)
 const logoRef = ref<HTMLElement | null>(null)
 const actionsRef = ref<HTMLElement | null>(null)
@@ -232,13 +232,12 @@ const exportBtnRef = ref<HTMLElement | null>(null)
 const saveBtnRef = ref<HTMLElement | null>(null)
 const backBtnRef = ref<HTMLElement | null>(null)
 
-// === Onboarding (без изменений)
+// === Onboarding ===
 const showOnboarding = ref(false)
 const activeStep = ref(-1)
 const highlightRect = ref({ top: 0, left: 0, right: 0, bottom: 0 })
 const tooltipPosition = ref({ top: 0, left: 0 })
 
-// ⚠️ actionsRef — теперь выделяет всю панель, чтобы не мелькало
 const steps = [
   {
     target: logoRef,
@@ -335,7 +334,7 @@ const finishOnboarding = () => {
   localStorage.setItem('editor-onboarding-seen', 'true')
 }
 
-// === Шаблоны: модальное окно и логика ===
+// === Шаблоны ===
 const showTemplateModal = ref(false)
 const templateName = ref('')
 const templateDescription = ref('')
@@ -351,8 +350,6 @@ const saveAsTemplate = async () => {
   if (!grapesData.value) return
   if (!templateName.value.trim()) return
 
-  // 🔍 Авто-определение палитры
-
   try {
     savingTemplate.value = true
     alert('✅ Шаблон успешно сохранён!')
@@ -365,20 +362,55 @@ const saveAsTemplate = async () => {
   }
 }
 
-
 // === Управление проектом ===
 const route = useRoute()
 const router = useRouter()
 const projectId = route.params.id as string
 const isNew = route.path === '/editor/new'
 
-// ✅ Центральное хранилище данных GrapesJS (реактивное!)
 const grapesData = ref<Record<string, unknown> | null>(null)
 const grapesEditorRef = ref<InstanceType<typeof GrapesEditor> | null>(null)
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-let currentEditor: Editor | null = null // для прямого доступа (если вдруг понадобится)
+const currentEditor = ref<Editor | null>(null) // ✅ ref, а не let
 const projectName = ref<string>('')
 const saving = ref(false)
+
+const EMPTY_PROJECT_DATA = {
+  pages: [
+    {
+      frames: [
+        {
+          component: {
+            type: 'wrapper',
+            components: [],
+            stylable: [
+              'background',
+              'background-color',
+              'background-image',
+              'background-repeat',
+              'background-attachment',
+              'background-position',
+              'background-size',
+            ],
+            head: { type: 'head' },
+            docEl: { tagName: 'html' },
+          },
+          id: 'main-frame',
+        },
+      ],
+      type: 'main',
+      id: 'main-page',
+    },
+  ],
+  styles: [],
+  assets: [],
+  symbols: [],
+  dataSources: [],
+}
+
+// ✅ ОБЯЗАТЕЛЬНО до onMounted
+const onEditorReady = (editor: Editor) => {
+  currentEditor.value = editor
+}
 
 const loadProject = async () => {
   if (isNew) return null
@@ -394,27 +426,27 @@ const loadProject = async () => {
 }
 
 const saveProject = async () => {
-  if (!grapesData.value) return
+  if (!grapesData.value) {
+    alert('❌ Нет данных для сохранения')
+    return
+  }
 
   const name = projectName.value.trim() || 'Без названия'
+  const payload = {
+    name,
+    ...grapesData.value,
+    framesCount: 1,
+  }
 
   try {
     saving.value = true
-
     if (isNew) {
-      const { data } = await api.post('/projects', {
-        name,
-        jsonModel: grapesData.value,
-        framesCount: 1,
-      })
+      const { data } = await api.post('/projects', payload)
       router.replace(`/editor/${data.id}`)
       projectName.value = data.name
+      grapesData.value = data.jsonModel || grapesData.value
     } else {
-      await api.put(`/projects/${projectId}`, {
-        name,
-        jsonModel: grapesData.value,
-        framesCount: 1,
-      })
+      await api.put(`/projects/${projectId}`, payload)
       alert('✅ Проект сохранён!')
     }
   } catch (e) {
@@ -425,43 +457,32 @@ const saveProject = async () => {
   }
 }
 
-const exportToJson = async () => {
-  if (!grapesData.value) {
-    alert('❌ Нет данных для публикации')
+// ✅ Исправленная функция экспорта
+const exportToJson = () => {
+  if (!currentEditor.value) {
+    alert('❌ Редактор ещё не готов')
     return
   }
 
-  const name = projectName.value.trim() || 'Без названия'
-
-  try {
-    // Если проект ещё не сохранён (новый), сначала сохраним его
-    if (isNew) {
-      await saveProject() // это обновит URL и projectId
-      if (!route.params.id) return // на случай ошибки
-    }
-
-    // Теперь публикуем
-    const response = await api.post(`/projects/${route.params.id}/publish`, {
-      name,
-      jsonModel: grapesData.value,
-    })
-
-    const publishedUrl = response.data?.url || `/preview/${route.params.id}`
-    alert(`✅ Проект опубликован! Ссылка: ${publishedUrl}`)
-    
-    // Опционально: открыть в новой вкладке
-    // window.open(publishedUrl, '_blank')
-  } catch (e) {
-    console.error('Ошибка публикации:', e)
-    alert('❌ Не удалось опубликовать проект')
+  const name = (projectName.value || 'landing').replace(/\s+/g, '_')
+  const data = {
+    html: currentEditor.value.getHtml(),
+    css: currentEditor.value.getCss(),
   }
-}
-// 🔑 Важно: ловим редактор из компонента
-const onEditorReady = (editor: Editor) => {
-  currentEditor = editor
-  // Можно добавить кастомные блоки динамически (но лучше в GrapesEditor.vue)
-}
 
+  const jsonStr = JSON.stringify(data, null, 2)
+  const blob = new Blob([jsonStr], { type: 'application/json' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = `${name}.json`
+  document.body.appendChild(a)
+  a.click()
+  URL.revokeObjectURL(url)
+  document.body.removeChild(a)
+
+  alert('✅ Экспорт завершён! Файл содержит точный HTML и CSS.')
+}
 
 onMounted(async () => {
   const project = isNew ? null : await loadProject()
@@ -469,13 +490,12 @@ onMounted(async () => {
     grapesData.value = project.jsonModel
     projectName.value = project.name
   } else {
-    grapesData.value = null
+    grapesData.value = EMPTY_PROJECT_DATA
     projectName.value = 'Новый проект'
   }
   startOnboarding()
 })
 
-// Закрывать модалку по Esc
 watch(showTemplateModal, (isOpen) => {
   const handleEsc = (e: KeyboardEvent) => {
     if (e.key === 'Escape') showTemplateModal.value = false
@@ -493,7 +513,6 @@ onUnmounted(() => {
   })
 })
 </script>
-
 
 <style scoped>
 @keyframes float {
@@ -518,4 +537,3 @@ onUnmounted(() => {
   animation-delay: 2s;
 }
 </style>
-
