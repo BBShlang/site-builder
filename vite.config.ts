@@ -11,12 +11,11 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5173, // опционально, для явного указания порта
     proxy: {
       '/api': {
-        target: 'http://26.86.179.119:8080',
+        target: 'http://localhost:8080', // локальный бекенд
         changeOrigin: true,
-        secure: false, // если бэкенд по HTTP (не HTTPS)
+        secure: false,
       },
     },
   },

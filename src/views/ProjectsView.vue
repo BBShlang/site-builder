@@ -1,4 +1,3 @@
-<!-- src/views/ProjectsView.vue -->
 <template>
   <div class="min-h-screen bg-gradient-to-br from-[#f0f4ff] via-[#fdf6ff] to-[#fff0f8] py-16 px-4 overflow-hidden relative">
     <!-- Фоновые декоративные элементы -->
@@ -17,12 +16,13 @@
         </p>
       </div>
 
-      <!-- Сетка проектов -->
+      <!-- Загрузка -->
       <div v-if="loading" class="text-center py-16 animate-fade-in-delay-2">
         <div class="inline-block w-8 h-8 border-4 border-[#6a5af9] border-t-transparent rounded-full animate-spin"></div>
         <p class="mt-4 text-gray-600">Загрузка проектов...</p>
       </div>
 
+      <!-- Нет проектов -->
       <div v-else-if="projects.length === 0" class="max-w-2xl mx-auto animate-fade-in-delay-2">
         <div class="bg-white/70 backdrop-blur-sm rounded-2xl border-2 border-dashed border-[#6a5af9]/30 p-12 text-center shadow-lg">
           <div class="mx-auto w-16 h-16 bg-[#e6dfff] rounded-2xl flex items-center justify-center mb-5">
@@ -34,7 +34,7 @@
           <p class="text-gray-600 mb-6 max-w-md mx-auto">
             Начните с создания первого проекта — всего за пару минут вы получите готовый сайт
           </p>
-          <button 
+          <button
             @click="createNewProject"
             class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-[#6a5af9] to-[#a66bff] text-white font-medium rounded-2xl shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-0.5"
           >
@@ -46,16 +46,35 @@
         </div>
       </div>
 
+      <!-- Список проектов -->
       <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 animate-fade-in-delay-2">
-        <div 
-          v-for="project in projects" 
+        <!-- Всегда первый: карточка "Новый лендинг" -->
+        <button
+          type="button"
+          @click="createNewProject"
+          class="bg-white/60 backdrop-blur-sm rounded-2xl border-2 border-dashed border-[#6a5af9]/40 py-8 px-4 shadow-md hover:shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-white/80 flex flex-col items-center justify-center"
+        >
+          <div class="w-12 h-12 bg-[#e6dfff] rounded-2xl flex items-center justify-center mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-[#6a5af9]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </div>
+          <p class="font-semibold text-gray-800 mb-1">Новый лендинг</p>
+          <p class="text-xs text-gray-500 text-center">
+            Создать новый проект с нуля
+          </p>
+        </button>
+
+        <!-- Остальные проекты -->
+        <div
+          v-for="project in projects"
           :key="project.id"
           class="bg-white/70 backdrop-blur-sm rounded-2xl border border-white/40 overflow-hidden shadow-lg hover:shadow-xl transition-all duration-400 group hover:-translate-y-1 hover:scale-[1.01] relative"
         >
-          <!-- Кнопка удаления -->
+          <!-- Удаление -->
           <div class="absolute top-4 right-4 flex gap-1 z-10">
-            <button 
-              @click.stop="deleteProject(project.id)" 
+            <button
+              @click.stop="deleteProjectById(project.id)"
               class="p-1.5 bg-white/80 rounded-full shadow-sm text-gray-500 hover:text-red-500 hover:bg-red-50/80 transition-all backdrop-blur-sm"
               title="Удалить"
             >
@@ -86,12 +105,7 @@
             </div>
 
             <div class="flex justify-between items-center text-xs text-gray-500">
-              <span class="flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                </svg>
-                {{ project.framesCount }} фрейм{{ plural(project.framesCount) }}
-              </span>
+
               <span class="text-sm font-medium text-[#6a5af9] group-hover:text-[#d966ff]">
                 → Открыть
               </span>
@@ -103,163 +117,85 @@
   </div>
 </template>
 
-<style scoped>
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(16px) scale(0.98); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0px) rotate(0deg); }
-  50% { transform: translateY(-12px) rotate(2deg); }
-}
-
-@keyframes pulse-slow {
-  0%, 100% { opacity: 0.3; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(1.05); }
-}
-
-.animate-fade-in {
-  animation: fade-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
-}
-
-.animate-fade-in-delay-1 {
-  animation: fade-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.15s forwards;
-  animation-fill-mode: both;
-}
-
-.animate-fade-in-delay-2 {
-  animation: fade-in 0.7s cubic-bezier(0.22, 0.61, 0.36, 1) 0.3s forwards;
-  animation-fill-mode: both;
-}
-
-.animate-float {
-  animation: float 8s ease-in-out infinite;
-}
-
-.animate-pulse-slow {
-  animation: pulse-slow 6s ease-in-out infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-3000 {
-  animation-delay: 3s;
-}
-</style>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/api/client'
+import { fetchProjects, deleteProject } from '@/api/client'
 
 const router = useRouter()
-const projects = ref<any[]>([])
+
+interface ProjectView {
+  id: string
+  name: string
+  updatedAt: string | null
+  pagesCount: number
+  framesCount: number
+}
+
+const projects = ref<ProjectView[]>([])
 const loading = ref(true)
 
-// Вспомогательная функция: получить userId из localStorage
-const getUserId = (): string | null => {
-  return localStorage.getItem('userId')
+const formatDate = (iso: string | null) => {
+  if (!iso) return 'неизвестно'
+  return new Date(iso).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'long',
+  })
 }
 
-// Вспомогательная функция: извлечь name и framesCount из jsonData
-const extractProjectInfo = (project: any) => {
-  try {
-    const data = project.jsonData ? JSON.parse(project.jsonData) : {}
-    return {
-      ...project,
-      name: data.name || 'Без названия',
-      framesCount: data.frames ? data.frames.length : 0,
-      updatedAt: project.updatedAt || new Date().toISOString(),
-    }
-  } catch {
-    return {
-      ...project,
-      name: 'Без названия',
-      framesCount: 0,
-      updatedAt: project.updatedAt || new Date().toISOString(),
-    }
-  }
+// Правильное окончание для фреймов
+const plural = (n: number) => {
+  if (n % 10 === 1 && n % 100 !== 11) return ''
+  if ([2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100)) return 'а'
+  return 'ов'
 }
 
-const fetchProjects = async () => {
+const loadProjects = async () => {
+  loading.value = true
   try {
-    const { data } = await api.get('/api/projects') // ✅ /api/projects
-    projects.value = Array.isArray(data)
-      ? data.map(extractProjectInfo)
-      : []
+    const list = await fetchProjects()
+
+    projects.value = list.map((p: any) => {
+      let json: any = {}
+      try {
+        json = JSON.parse(p.jsonData || '{}')
+      } catch (e) {
+        console.error('Ошибка парсинга jsonData', e)
+      }
+
+      return {
+        id: p.id,
+        name: json.name || 'Без названия',
+        updatedAt: json.updatedAt || null,
+        pagesCount: json.pages ? json.pages.length : 1,
+        framesCount: json.frames ? json.frames.length : 0,
+      }
+    })
   } catch (e) {
-    console.error('Ошибка загрузки проектов:', e)
-    alert('❌ Не удалось загрузить список проектов')
-    projects.value = []
+    console.error(e)
+    alert('Ошибка загрузки проектов')
   } finally {
     loading.value = false
   }
 }
 
-const createNewProject = async () => {
-  const userId = getUserId()
-  if (!userId) {
-    alert('❌ Вы не авторизованы')
-    router.push('/login')
-    return
-  }
+// 🔹 Теперь создание нового проекта — это просто переход в редактор "new"
+const createNewProject = () => {
+  router.push('/editor/new')
+}
 
+const openEditor = (id: string) => router.push(`/editor/${id}`)
+
+const deleteProjectById = async (id: string) => {
+  if (!confirm('Удалить проект?')) return
   try {
-    // Формируем jsonData с UI-полями
-    const jsonData = JSON.stringify({
-      name: `Новый лендинг ${projects.value.length + 1}`,
-      frames: [], // пустой массив фреймов
-    })
-
-    // Отправляем структуру, как ожидает бэкенд
-    const { data } = await api.post('/api/projects', {
-      jsonData,
-      user: {
-        id: userId, // ✅ только id, без password!
-      },
-    })
-
-    router.push(`/editor/${data.id}`)
+    await deleteProject(id)
+    projects.value = projects.value.filter((p) => p.id !== id)
   } catch (e) {
-    console.error('Ошибка создания проекта:', e)
-    alert('❌ Не удалось создать проект')
+    console.error(e)
+    alert('Ошибка удаления')
   }
 }
 
-const openEditor = (id: string) => {
-  router.push(`/editor/${id}`)
-}
-
-const deleteProject = async (id: string) => {
-  if (!confirm('Удалить лендинг? Действие нельзя отменить.')) return
-  try {
-    await api.delete(`/api/projects/${id}`) // ✅ /api/projects
-    projects.value = projects.value.filter(p => p.id !== id)
-    alert('✅ Проект удалён')
-  } catch (e) {
-    console.error('Ошибка удаления:', e)
-    alert('❌ Не удалось удалить проект')
-  }
-}
-
-const formatDate = (iso: string) => {
-  return new Date(iso).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'long',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
-}
-
-const plural = (n: number) => {
-  if (n === 1) return 'а'
-  if (n > 1 && n < 5) return 'ы'
-  return ''
-}
-
-onMounted(() => {
-  fetchProjects()
-})
+onMounted(loadProjects)
 </script>

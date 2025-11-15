@@ -1,0 +1,268 @@
+{
+  "id": "builtin-online-course",
+  "name": "Онлайн-курс",
+  "description": "Готовый лендинг для онлайн-школ и курсов",
+  "colorPalette": ["#4f46e5", "#7c3aed", "#ec4899"],
+  "model": {
+    "name": "Онлайн-курс",
+    "assets": [],
+    "styles": [],
+    "symbols": [],
+    "pages": [
+      {
+        "id": "page-course",
+        "type": "main",
+        "frames": [
+          {
+            "id": "frame-course",
+            "component": {
+              "tagName": "body",
+              "type": "wrapper",
+              "style": {
+                "margin": "0",
+                "font-family": "system-ui, sans-serif",
+                "background": "white",
+                "color": "#1e293b"
+              },
+              "components": [
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "hero" },
+                  "style": {
+                    "max-width": "1100px",
+                    "margin": "0 auto",
+                    "padding": "72px 32px",
+                    "display": "grid",
+                    "grid-template-columns": "minmax(0,1fr) minmax(0,1fr)",
+                    "gap": "40px",
+                    "align-items": "center"
+                  },
+                  "components": [
+                    {
+                      "tagName": "div",
+                      "components": [
+                        {
+                          "tagName": "h1",
+                          "style": {
+                            "font-size": "40px",
+                            "font-weight": "700",
+                            "line-height": "1.1",
+                            "margin-bottom": "16px",
+                            "color": "#312e81"
+                          },
+                          "components": [
+                            { "type": "textnode", "content": "Освой новую профессию " },
+                            {
+                              "tagName": "span",
+                              "style": {
+                                "color": "#7c3aed"
+                              },
+                              "components": [
+                                { "type": "textnode", "content": "за 2 месяца" }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": {
+                            "font-size": "16px",
+                            "line-height": "1.7",
+                            "color": "#475569",
+                            "margin-bottom": "24px"
+                          },
+                          "components": [
+                            { "type": "textnode", "content": "Онлайн-курс с наставником, домашними заданиями и практикой на реальных проектах." }
+                          ]
+                        },
+                        {
+                          "tagName": "button",
+                          "style": {
+                            "background": "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                            "padding": "14px 28px",
+                            "color": "white",
+                            "border-radius": "10px",
+                            "border": "none",
+                            "cursor": "pointer",
+                            "font-size": "15px",
+                            "font-weight": "600",
+                            "margin-bottom": "16px"
+                          },
+                          "components": [
+                            { "type": "textnode", "content": "Записаться на курс" }
+                          ]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": { "font-size": "13px", "color": "#94a3b8" },
+                          "components": [
+                            { "type": "textnode", "content": "Старт каждую неделю. Места ограничены." }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "tagName": "div",
+                      "style": {
+                        "border-radius": "24px",
+                        "background": "linear-gradient(135deg,#7c3aed22,#ec489922)",
+                        "padding": "32px",
+                        "text-align": "center"
+                      },
+                      "components": [
+                        {
+                          "tagName": "div",
+                          "style": {
+                            "width": "140px",
+                            "height": "140px",
+                            "border-radius": "9999px",
+                            "margin": "0 auto 16px",
+                            "background": "#ddd"
+                          }
+                        },
+                        {
+                          "tagName": "h3",
+                          "style": { "font-size": "18px", "font-weight": "600", "margin-bottom": "6px" },
+                          "components": [{ "type": "textnode", "content": "Преподаватель" }]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": { "font-size": "14px", "color": "#475569" },
+                          "components": [{ "type": "textnode", "content": "10+ лет опыта. Работал в крупных IT-компаниях." }]
+                        }
+                      ]
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "program" },
+                  "style": {
+                    "max-width": "1100px",
+                    "margin": "0 auto",
+                    "padding": "40px 32px"
+                  },
+                  "components": [
+                    {
+                      "tagName": "h2",
+                      "style": {
+                        "font-size": "28px",
+                        "font-weight": "700",
+                        "color": "#312e81",
+                        "margin-bottom": "24px"
+                      },
+                      "components": [{ "type": "textnode", "content": "Программа курса" }]
+                    },
+                    {
+                      "tagName": "ul",
+                      "style": {
+                        "margin": "0",
+                        "padding": "0",
+                        "list-style": "none",
+                        "display": "grid",
+                        "gap": "14px"
+                      },
+                      "components": [
+                        {
+                          "tagName": "li",
+                          "style": {
+                            "padding": "16px",
+                            "border-radius": "14px",
+                            "background": "rgba(124,58,237,0.08)",
+                            "font-size": "15px"
+                          },
+                          "components": [{ "type": "textnode", "content": "Модуль 1 — Основы" }]
+                        },
+                        {
+                          "tagName": "li",
+                          "style": {
+                            "padding": "16px",
+                            "border-radius": "14px",
+                            "background": "rgba(124,58,237,0.08)",
+                            "font-size": "15px"
+                          },
+                          "components": [{ "type": "textnode", "content": "Модуль 2 — Практика" }]
+                        },
+                        {
+                          "tagName": "li",
+                          "style": {
+                            "padding": "16px",
+                            "border-radius": "14px",
+                            "background": "rgba(124,58,237,0.08)",
+                            "font-size": "15px"
+                          },
+                          "components": [{ "type": "textnode", "content": "Модуль 3 — Проекты" }]
+                        }
+                      ]
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "reviews" },
+                  "style": {
+                    "max-width": "1100px",
+                    "margin": "0 auto",
+                    "padding": "40px 32px"
+                  },
+                  "components": [
+                    {
+                      "tagName": "h2",
+                      "style": { "font-size": "26px", "font-weight": "700", "margin-bottom": "20px" },
+                      "components": [{ "type": "textnode", "content": "Отзывы студентов" }]
+                    },
+                    {
+                      "tagName": "p",
+                      "style": {
+                        "padding": "22px 22px",
+                        "border-radius": "16px",
+                        "background": "rgba(79,70,229,0.08)",
+                        "font-size": "14px",
+                        "line-height": "1.6"
+                      },
+                      "components": [
+                        { "type": "textnode", "content": "«Лучший курс! Получил оффер через 3 недели после окончания.»" }
+                      ]
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "cta" },
+                  "style": {
+                    "text-align": "center",
+                    "padding": "60px 32px",
+                    "background": "linear-gradient(135deg,#4f46e511,#ec489911)"
+                  },
+                  "components": [
+                    {
+                      "tagName": "h2",
+                      "style": { "font-size": "32px", "margin-bottom": "16px", "color": "#312e81" },
+                      "components": [{ "type": "textnode", "content": "Начни обучение сегодня" }]
+                    },
+                    {
+                      "tagName": "button",
+                      "style": {
+                        "background": "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                        "padding": "14px 28px",
+                        "color": "white",
+                        "border-radius": "12px",
+                        "border": "none",
+                        "cursor": "pointer",
+                        "font-size": "15px"
+                      },
+                      "components": [{ "type": "textnode", "content": "Записаться" }]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

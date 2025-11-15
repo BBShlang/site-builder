@@ -1,0 +1,229 @@
+{
+  "id": "template-saas-service",
+  "name": "SaaS-сервис",
+  "description": "Для IT-продуктов: акцент на функционал, UI и выгоды",
+  "colorPalette": ["#1e293b", "#334155", "#64748b"],
+  "model": {
+    "name": "SaaS-сервис",
+    "assets": [],
+    "styles": [],
+    "symbols": [],
+    "pages": [
+      {
+        "id": "page-saas",
+        "type": "main",
+        "frames": [
+          {
+            "id": "frame-saas",
+            "component": {
+              "tagName": "body",
+              "type": "wrapper",
+              "style": {
+                "margin": "0",
+                "font-family": "system-ui,sans-serif",
+                "background": "#f8fafc",
+                "color": "#1e293b"
+              },
+              "components": [
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "hero" },
+                  "style": {
+                    "max-width": "1150px",
+                    "margin": "0 auto",
+                    "padding": "72px 32px",
+                    "text-align": "center"
+                  },
+                  "components": [
+                    {
+                      "tagName": "h1",
+                      "style": {
+                        "font-size": "42px",
+                        "font-weight": "700",
+                        "color": "#1e293b",
+                        "margin-bottom": "16px"
+                      },
+                      "components": [
+                        { "type": "textnode", "content": "Помогаем вашему бизнесу " },
+                        {
+                          "tagName": "span",
+                          "style": { "color": "#334155" },
+                          "components": [{ "type": "textnode", "content": "расти быстрее" }]
+                        }
+                      ]
+                    },
+                    {
+                      "tagName": "p",
+                      "style": {
+                        "font-size": "16px",
+                        "max-width": "600px",
+                        "margin": "0 auto 24px",
+                        "color": "#475569",
+                        "line-height": "1.7"
+                      },
+                      "components": [
+                        {
+                          "type": "textnode",
+                          "content": "Сервис для автоматизации процессов, интеграций и аналитики."
+                        }
+                      ]
+                    },
+                    {
+                      "tagName": "button",
+                      "style": {
+                        "background": "#1e293b",
+                        "color": "white",
+                        "padding": "14px 28px",
+                        "border-radius": "10px",
+                        "border": "none",
+                        "cursor": "pointer",
+                        "font-size": "15px"
+                      },
+                      "components": [{ "type": "textnode", "content": "Попробовать бесплатно" }]
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "features" },
+                  "style": {
+                    "max-width": "1150px",
+                    "margin": "0 auto",
+                    "padding": "32px",
+                    "display": "grid",
+                    "grid-template-columns": "repeat(3,minmax(0,1fr))",
+                    "gap": "20px"
+                  },
+                  "components": [
+                    {
+                      "tagName": "div",
+                      "style": {
+                        "padding": "20px",
+                        "background": "white",
+                        "border-radius": "16px",
+                        "box-shadow": "0 4px 16px rgba(0,0,0,0.05)"
+                      },
+                      "components": [
+                        {
+                          "tagName": "h3",
+                          "style": { "font-size": "18px", "font-weight": "600", "margin-bottom": "8px" },
+                          "components": [{ "type": "textnode", "content": "Интеграции" }]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": { "font-size": "14px", "color": "#64748b" },
+                          "components": [{ "type": "textnode", "content": "Поддержка API и вебхуков." }]
+                        }
+                      ]
+                    },
+
+                    {
+                      "tagName": "div",
+                      "style": {
+                        "padding": "20px",
+                        "background": "white",
+                        "border-radius": "16px",
+                        "box-shadow": "0 4px 16px rgba(0,0,0,0.05)"
+                      },
+                      "components": [
+                        {
+                          "tagName": "h3",
+                          "style": { "font-size": "18px", "font-weight": "600", "margin-bottom": "8px" },
+                          "components": [{ "type": "textnode", "content": "Аналитика" }]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": { "font-size": "14px", "color": "#64748b" },
+                          "components": [{ "type": "textnode", "content": "Дашборды, графики, отчёты." }]
+                        }
+                      ]
+                    },
+
+                    {
+                      "tagName": "div",
+                      "style": {
+                        "padding": "20px",
+                        "background": "white",
+                        "border-radius": "16px",
+                        "box-shadow": "0 4px 16px rgba(0,0,0,0.05)"
+                      },
+                      "components": [
+                        {
+                          "tagName": "h3",
+                          "style": { "font-size": "18px", "font-weight": "600", "margin-bottom": "8px" },
+                          "components": [{ "type": "textnode", "content": "Автоматизация" }]
+                        },
+                        {
+                          "tagName": "p",
+                          "style": { "font-size": "14px", "color": "#64748b" },
+                          "components": [{ "type": "textnode", "content": "Сценарии, события и правила." }]
+                        }
+                      ]
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "screenshot" },
+                  "style": {
+                    "max-width": "1150px",
+                    "margin": "0 auto",
+                    "padding": "40px 32px"
+                  },
+                  "components": [
+                    {
+                      "tagName": "div",
+                      "style": {
+                        "background": "#e2e8f0",
+                        "border-radius": "18px",
+                        "height": "340px"
+                      },
+                      "components": []
+                    }
+                  ]
+                },
+
+                {
+                  "tagName": "section",
+                  "attributes": { "id": "cta" },
+                  "style": {
+                    "text-align": "center",
+                    "padding": "60px 32px",
+                    "background": "white"
+                  },
+                  "components": [
+                    {
+                      "tagName": "h2",
+                      "style": {
+                        "font-size": "32px",
+                        "font-weight": "700",
+                        "margin-bottom": "18px",
+                        "color": "#1e293b"
+                      },
+                      "components": [{ "type": "textnode", "content": "Начните пользоваться прямо сейчас" }]
+                    },
+                    {
+                      "tagName": "button",
+                      "style": {
+                        "background": "#1e293b",
+                        "color": "white",
+                        "padding": "14px 28px",
+                        "border-radius": "10px",
+                        "border": "none",
+                        "cursor": "pointer",
+                        "font-size": "15px"
+                      },
+                      "components": [{ "type": "textnode", "content": "Получить доступ" }]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    ]
+  }
+}

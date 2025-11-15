@@ -4,7 +4,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, defineProps, defineEmits } from 'vue'
+import { onMounted, onUnmounted, ref, defineProps, defineEmits, watch } from 'vue'
 import grapesjs, { Editor } from 'grapesjs'
 import 'grapesjs/dist/css/grapes.min.css'
 
@@ -12,11 +12,7 @@ import webpagePreset from 'grapesjs-preset-webpage'
 import tabsPlugin from 'grapesjs-tabs'
 
 const props = defineProps<{
-  modelValue?: {
-    components?: unknown[]
-    styles?: unknown[]
-    pages?: unknown[]
-  } | null
+  modelValue?: any | null
 }>()
 
 const emit = defineEmits<{
@@ -26,6 +22,7 @@ const emit = defineEmits<{
 
 const container = ref<HTMLDivElement | null>(null)
 let editor: Editor | null = null
+let loadedFromPropsOnce = false
 
 // Утилита: загрузка файла и конвертация в base64
 function fileToBase64(file: File): Promise<string> {
@@ -110,6 +107,22 @@ const mediaUploadPlugin = (editor: Editor) => {
   })
 }
 
+// === Функция начальной загрузки проекта в GrapesJS ===
+const loadProjectFromProps = (val: any) => {
+  if (!editor) return
+  if (!val) return
+  if (loadedFromPropsOnce) return
+
+  try {
+    // JSON, который ты сохраняешь (dataSources, assets, styles, pages, symbols, name, updatedAt) —
+    // это как раз формат getProjectData/loadProjectData
+    editor.loadProjectData(val as any)
+    loadedFromPropsOnce = true
+  } catch (e) {
+    console.error('Ошибка загрузки проекта в GrapesJS', e)
+  }
+}
+
 onMounted(() => {
   if (!container.value) return
 
@@ -136,37 +149,18 @@ onMounted(() => {
   // Эмитим редактор
   emit('ready', editor)
 
-  // Загружаем начальные данные, если есть
-  if (props.modelValue) {
-    editor.setComponents(props.modelValue.components || [])
-    editor.setStyle(props.modelValue.styles || [])
-  }
+  // Если на момент маунта уже есть данные (маловероятно, но на всякий случай)
+  loadProjectFromProps(props.modelValue)
 
-  // Функция синхронизации модели
+  // Функция синхронизации модели — берём ВСЕ данные проекта
   const updateModel = () => {
-    const components = editor!.getComponents().toJSON()
-    const styles = editor!.getStyle().toJSON()
-
-    let pages = []
-    if (editor!.Pages) {
-      pages = editor!.Pages.getAll().map(p => p.toJSON())
-    } else {
-      // fallback на случай, если Pages API недоступен
-      pages = [{
-        id: 'main',
-        name: 'Main',
-        component: { type: 'body', components },
-        styles,
-      }]
-    }
-
-    emit('update:modelValue', { components, styles, pages })
+    if (!editor) return
+    const data = editor.getProjectData()
+    emit('update:modelValue', data as Record<string, unknown>)
   }
 
-  // Подписка на изменения
-  editor.on('component:add component:remove component:update style:change', () => {
-    updateModel()
-  })
+  // Универсальное событие изменений проекта
+  editor.on('update', updateModel)
 
   // Инициализация блоков
   const bm = editor.BlockManager
@@ -184,7 +178,8 @@ onMounted(() => {
   bm.add('header', {
     label: 'Шапка',
     category: 'Структура',
-    content: `<header style="display:flex; justify-content:space-between; padding:20px; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);">Логотип<div>Меню</div></header>`,
+    content:
+      '<header style="display:flex; justify-content:space-between; padding:20px; background:white; box-shadow:0 2px 8px rgba(0,0,0,0.05);">Логотип<div>Меню</div></header>',
   })
 
   // === Подвал ===
@@ -207,9 +202,9 @@ onMounted(() => {
     category: 'Медиа',
     content: {
       type: 'image',
-      attributes: { 
+      attributes: {
         src: 'image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="250" viewBox="0 0 400 250"%3E%3Crect width="400" height="250" fill="%23f1f5f9"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dominant-baseline="middle" font-family="Arial" font-size="16" fill="%2394a3b8"%3EДважды кликните, чтобы загрузить фото%3C/text%3E%3C/svg%3E',
-        alt: 'Изображение'
+        alt: 'Изображение',
       },
       style: { width: '100%', height: 'auto', display: 'block', cursor: 'pointer' },
     },
@@ -257,6 +252,15 @@ onMounted(() => {
   })
 })
 
+// 🔹 ВАЖНО: реагируем на приход данных из родителя (EditorView)
+watch(
+  () => props.modelValue,
+  (val) => {
+    // сюда мы попадём, когда EditorView сделает grapesData = modelFromBackend
+    loadProjectFromProps(val)
+  },
+)
+
 onUnmounted(() => {
   if (editor) {
     editor.destroy()
@@ -264,9 +268,3 @@ onUnmounted(() => {
   }
 })
 </script>
-
-<style scoped>
-.grapes-editor :deep(.gjs-cv-canvas) {
-  padding: 0;
-}
-</style>
