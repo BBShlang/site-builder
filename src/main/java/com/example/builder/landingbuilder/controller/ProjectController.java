@@ -86,7 +86,8 @@ public class ProjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Project> updateProject(@PathVariable UUID id, @RequestBody CreateProjectRequest request) {
+    public ResponseEntity<Project> updateProject(@PathVariable UUID id,
+                                                 @RequestBody CreateProjectRequest request) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = getCurrentUser(auth);
         if (currentUser == null) {
@@ -103,11 +104,14 @@ public class ProjectController {
     }
 
     /**
-     * Публикация проекта:
-     * - проверяем, что проект принадлежит текущему пользователю;
-     * - обновляем jsonData;
-     * - вызываем Python-рендер;
-     * - возвращаем сгенерированный HTML.
+     * ПУБЛИКАЦИЯ ПРОЕКТА:
+     *  - обновляет jsonData,
+     *  - вызывает Python-рендер,
+     *  - возвращает HTML и CSS, чтобы фронт мог показать лендинг в браузере.
+     *
+     * POST /api/projects/{id}/publish
+     * Body: { "jsonData": "..." }
+     * Response: { "status": "ok", "html": "...", "css": "..." }
      */
     @PostMapping("/{id}/publish")
     public ResponseEntity<ProjectPublishResponse> publishProject(
@@ -125,11 +129,13 @@ public class ProjectController {
             return ResponseEntity.status(403).build();
         }
 
+        // Обновляем jsonData и рендерим через Python
         var renderResult = projectService.publishProject(project, request.getJsonData());
 
         ProjectPublishResponse response = new ProjectPublishResponse(
                 "ok",
-                renderResult.html(), null
+                renderResult.html(),
+                renderResult.css()
         );
 
         return ResponseEntity.ok(response);
